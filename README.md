@@ -33,8 +33,8 @@ openssl req -newkey rsa:4096 -nodes -sha256 -keyout domain.key -x509 -days 365 -
 
 1. Agregar el equipo cliente como válido para la unidad certificadora.
 ```sh
-mkdir -p /etc/docker/certs.d/[IP de la computadora:5000]
-cp /certificates/domain.crt /etc/docker/certs.d/[IP de la computadora:5000]/ca.crt
+mkdir -p /etc/docker/certs.d/[IP de la computadora cliente]:5013
+cp certs/domain.crt /etc/docker/certs.d/[IP de la computadora cliente]:5013/ca.crt
 ```
 
 2. Reinicar el servicio de docker
@@ -53,6 +53,26 @@ mkdir volume
 ```sh
 mkdir auth
 ```
+## 5. Creación de usuario en docker Registry
 
+1. Creación de usuario.  Reemplazar user y pass por datos de su elección.
+```sh
+docker run --entrypoint htpasswd registry:2.7.0 -Bbn [user] [pass] > auth/htpasswd
+```
 
-# Pasos para la ejecución y pruebas.
+2. Iniciar sesión: intenta usar localhost cuando sea la misma computadora.  Usa las mismas credenciales para el inicio de sesión.
+```sh
+docker login [IP de la computadora cliente]:5013
+```
+
+# Pasos para subir una imagen
+
+1. Crear un tag y versión a la imagen
+```sh
+docker tag [nombre de la imagen] [IP de la computadora]:5013/[nombre de la imagen]:[puerto]
+```
+
+2. Subir una imágen
+```sh
+docker push [IP de la computadora]:5013/[nombre de la imagen]:[puerto]
+```
